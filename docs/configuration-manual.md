@@ -16,50 +16,19 @@ through an isolated host-only network. The first virtual environment
 machine (Windows server) acts as the monitored endpoint. Telemetry is
 collected through two separate paths.
 
-+----------------------+--------------------------+-------------------+
-| > **Component**      | > **Host**               | **Role**          |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| >                    | > Linux server           | Storage, search,  |
-| Elasticsearch+Kibana |                          | and Kibana        |
-|                      |                          | detection engine  |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| Logstash             | > Linux server           | Receives          |
-|                      |                          | Winlogbeat        |
-|                      |                          | telemetry         |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Wazuh Manager      | > Linux server           | Receives agent    |
-|                      |                          | events, applies   |
-|                      |                          | custom rules, and |
-|                      |                          | generate alerts   |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Filebeat           | > Linux server           | Forwards Wazuh    |
-|                      |                          | alerts            |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Sysmon             | > Windows endpoint       | Generate process, |
-|                      |                          | network, and file |
-|                      |                          | telemetry         |
-+----------------------+--------------------------+-------------------+
-| > Winlogbeat         | > Windows endpoint       | Forwards Sysmon   |
-|                      |                          | and windows       |
-|                      |                          | channel to        |
-|                      |                          | Logstash          |
-+----------------------+--------------------------+-------------------+
-| > Wazuh agent        | > Windows endpoint       | Forwards security |
-|                      |                          | events and alerts |
-|                      |                          | to Wazuh Manager  |
-+----------------------+--------------------------+-------------------+
 
-: Table 1 : System components
+|  **Component**      | **Host**               | **Role**          |
+|----------------------|--------------------------|-------------------|
+|   Elasticsearch+Kibana |  Linux server   | Storage, search, and Kibana  detection engine |
+| Logstash             |  Linux server           | Receives Winlogbeat telemetry  |
+|  Wazuh Manager      |  Linux server           | Receives agent events, applies custom rules, and generate alerts    |
+|  Filebeat           |  Linux server           | Forwards Wazuh alerts   |
+|  Sysmon             |  Windows endpoint       | Generate process, network, and file telemetry |
+|  Winlogbeat         |  Windows endpoint       | Forwards Sysmon and windows channel to  Logstash   |
+|  Wazuh agent        |  Windows endpoint       | Forwards security events and alerts to Wazuh Manager |
+
+
+Table 1 : System components
 
 # Prerequisites
 
@@ -82,53 +51,23 @@ collected through two separate paths.
 
 ## Tools Installed 
 
-+----------------------+--------------------------+-------------------+
-| > **Tool Name**      | > **Version Used**       | **Where It Runs** |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Oracle VirtualBox  | > Version 7.0.18 r162988 | Host              |
-|                      | > (Qt5.15.2)             |                   |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| Java                 | > OpenJDK version 21.0.8 | Linux analysis    |
-|                      |                          | server            |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Elastic Stack      | > 8.19.16                | Linux analysis    |
-| > (Elasticsearch,    |                          | server            |
-| > Kibana, Logstash)  |                          |                   |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Wazuh agent        | > 4.14.5                 | Windows endpoint  |
-+----------------------+--------------------------+-------------------+
-|                      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Wazuh Manager      | > 4.14.1                 | Linux analysis    |
-|                      |                          | server            |
-+----------------------+--------------------------+-------------------+
-| > Filebeat           | > 8.19.16                | Linux analysis    |
-|                      |                          | server            |
-+----------------------+--------------------------+-------------------+
-| > Winlogbeat         | > 9.4.2                  | Windows endpoint  |
-+----------------------+--------------------------+-------------------+
-| > Sysmon             | > v15.20                 | Windows endpoint  |
-+----------------------+--------------------------+-------------------+
-| > Sysmon             | > 4.90                   | Windows endpoint  |
-| > configuration      |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Kali Linux         | > 2025.3                 | Linux analysis    |
-| > (analysis server   |                          | server            |
-| > OS)                |                          |                   |
-+----------------------+--------------------------+-------------------+
-| > Windows Server     | > 10.0.26100 N/A Build   | Windows endpoint  |
-| > 2025 (endpoint OS) | > 26100                  |                   |
-+----------------------+--------------------------+-------------------+
 
-: Table 2: Required tools to be installed
+|  **Tool Name**      |  **Version Used**       | **Where It Runs** |
+|-----------------------|-------------------------|-------------------|
+|  Oracle VirtualBox  |  Version 7.0.18 r162988 (Qt5.15.2)  | Host |
+| Java                 |  OpenJDK version 21.0.8 | Linux analysis server   |
+|  Elastic Stack (Elasticsearch, Kibana, Logstash) |  8.19.16 | Linux analysis server |
+|  Wazuh agent        |  4.14.5                 | Windows endpoint  |
+|  Wazuh Manager      |  4.14.1                 | Linux analysis server   |
+|  Filebeat           |  8.19.16                | Linux analysis server   |
+|  Winlogbeat         |  9.4.2                  | Windows endpoint  |
+|  Sysmon             |  v15.20                 | Windows endpoint  |
+|  Sysmon configuration  |  4.90              | Windows endpoint  |
+| Kali Linux (analysis server OS)        |  2025.3                 | Linux analysis server    |
+|  Windows Server 2025 (endpoint OS)    |  10.0.26100 N/A Build 26100   | Windows endpoint  |
+
+
+ Table 2: Required tools to be installed
 
 # Implementation
 
@@ -314,81 +253,23 @@ The detection rules are implemented in two locations, custom XML rule on
 the Wazuh Manager and EQL correlation rules in Kibana DetectionEengine.
 The complete rule set is provided in the table below.
 
-+----------------+-----------------------+------------+---------------+
-| > **Rule       | > **Detection Focus** | >          | **ATT&CK      |
-| > Family**     |                       |  **Primary | Mapping**     |
-|                |                       | > Source** |               |
-+----------------+-----------------------+------------+---------------+
-|                |                       |            |               |
-+----------------+-----------------------+------------+---------------+
-| > Encoded      | > PowerShell launched | > Sysmon   | T1059.001     |
-| > PowerShell   | > with an             | > process  |               |
-|                | > encoded-command     | > creation |               |
-|                | > flag                |            |               |
-+----------------+-----------------------+------------+---------------+
-|                |                       |            |               |
-+----------------+-----------------------+------------+---------------+
-| > Mshta proxy  | > Mshta executing a   | > Sysmon   | T1218.005     |
-| > execution    | > remote or inline    | > process  |               |
-|                | > script              | > creation |               |
-+----------------+-----------------------+------------+---------------+
-|                |                       |            |               |
-+----------------+-----------------------+------------+---------------+
-| > WMI child    | > Interpreter/LOLBin  | > Sysmon   | T1047         |
-| > process      | > spawned by the WMI  | > pa       |               |
-|                | > service             | rent-child |               |
-+----------------+-----------------------+------------+---------------+
-|                |                       |            |               |
-+----------------+-----------------------+------------+---------------+
-| > Reflective   | > Remote thread       | > Sysmon   | T1055.001     |
-| > injection    | > creation into       | > remote   |               |
-|                | > another process     | > thread   |               |
-|                |                       | > event    |               |
-+----------------+-----------------------+------------+---------------+
-|                |                       |            |               |
-+----------------+-----------------------+------------+---------------+
-| > Regsvr32     | > Regsvr32 executing  | > Sysmon   | T1218.010     |
-| > scriptlet    | > a remote scriptlet  | > process  |               |
-|                | > (squiblydoo)        | > creation |               |
-+----------------+-----------------------+------------+---------------+
-| > WMI event    | > WMI persistence via | > Sysmon   | T1546.003     |
-| > subscription | > event subscription  | > WMI      |               |
-|                |                       | > events   |               |
-+----------------+-----------------------+------------+---------------+
-| > Alternate    | > Payload hidden in   | > Sysmon   | T1564.004     |
-| > data streams | > an                  | > f        |               |
-|                | >                     | ile-stream |               |
-|                | > NTFS alternate data | > event    |               |
-|                | > stream              |            |               |
-+----------------+-----------------------+------------+---------------+
-| > Registry     | > Logging disabled    | > Sysmon   | T1562.002     |
-| > logging      | > via registry        | > registry |               |
-| > tamper       | > modification        | > event    |               |
-+----------------+-----------------------+------------+---------------+
-| > File         | > Suspicious file     | > Wazuh    | T1105         |
-| > integrity    | > written to a        | > FIM      |               |
-| > staging      | > staging location    |            |               |
-+----------------+-----------------------+------------+---------------+
-| > Chained      | > Ordered multi stage | > Sysmon   | Composite of  |
-| > r            | >                     | > and      | the above     |
-| ules-SIEM(EQL) | > sequence on one     | > Wazuh    |               |
-|                | > host within a time  | > alert    |               |
-|                | > window across both  | > index    |               |
-|                | > index               | > (EQL     |               |
-|                |                       | >          |               |
-|                |                       |  sequence) |               |
-+----------------+-----------------------+------------+---------------+
-| > Chained      | > Ordered multi stage | > Wazuh    | Composite of  |
-| > rules-       | > sequences via rule  | > rule     | the above     |
-| > EDR(Wazuh)   | > chaining            | > chaining |               |
-|                |                       | >          |               |
-|                |                       | (timeframe |               |
-|                |                       | > bounded) |               |
-+----------------+-----------------------+------------+---------------+
-|                |                       |            |               |
-+----------------+-----------------------+------------+---------------+
 
-: Table 3: List of detection rules
+|  **Rule Family**      |  **Detection Focus** | **Primary Source**          | **ATT&CK Mapping**      |
+|----------------|-----------------------|------------|---------------|
+|  Encoded PowerShell  |  PowerShell launched with an encoded-command flag |  Sysmon process creation   | T1059.001     |
+| Mshta proxy execution  |  Mshta executing a remote or inline script   |  Sysmon process creation  | T1218.005     |
+|  WMI child process     |  Interpreter/LOLBin spawned by the WMI service  |  Sysmon parent-child   | T1047         |
+|  Reflective injection  |  Remote thread creation into another process  |  Sysmon remote thread event   | T1055.001     |
+| Regsvr32 scriptlet    |  Regsvr32 executing a remote scriptlet (squiblydoo)  | Sysmon process creation    | T1218.010     |
+| WMI event subscription    |  WMI persistence via event subscription|  Sysmon WMI events  | T1546.003     |
+| Alternate data streams    |  Payload hidden in an NTFS alternate data stream  | Sysmon file-stream event | T1564.004     |
+| Registry logging tamper   | Logging disabled via registry modification   |  Sysmon registry event   | T1562.002     |
+|  File integrity staging    |  Suspicious file written to a staging location     | Wazuh FIM    | T1105         |
+|  Chained rules-SIEM(EQL) |  Ordered multi stage sequence on one host within a time window across both index  |  Sysmon and  Wazuh alert index (EQL sequence)  | Composite of the above  |
+| Chained rules-EDR(Wazuh) | Ordered multi stage sequences via rules chaining |  Wazuh rule chaining (timeframe bounded)    | Composite of the above |
+
+
+ Table 3: List of detection rules
 
 ## Wazuh Custom Rules
 
@@ -437,31 +318,14 @@ Figure 15: EQL rule creation window
 The three conditions are achieved by enabling and disabling the Wazuh
 agent service (WazuhSvc) and winlogbeat service.
 
-+------------------+------------------------------+-------------------+
-| > **Condition**  | > **Service State**          | **What Generates  |
-|                  |                              | Alerts**          |
-+------------------+------------------------------+-------------------+
-|                  |                              |                   |
-+------------------+------------------------------+-------------------+
-| A.  Wazuh EDR    | WazuhSvc running, winlogbeat | Wazuh custom      |
-|     only         | stopped                      | rules             |
-+------------------+------------------------------+-------------------+
-|                  |                              |                   |
-+------------------+------------------------------+-------------------+
-| B.  ELK only     | WazuhSvc Stopped, winlogbeat | EQL rules in      |
-|                  | running                      | Kibana with       |
-|                  |                              | winlogbeat-\*     |
-|                  |                              | index only        |
-+------------------+------------------------------+-------------------+
-|                  |                              |                   |
-+------------------+------------------------------+-------------------+
-| C.  Integrated   | WazuhSvc running, winlogbeat | Both platforms    |
-|                  | running                      | simultaneously    |
-+------------------+------------------------------+-------------------+
-|                  |                              |                   |
-+------------------+------------------------------+-------------------+
 
-: Table 4: Experimental conditions setup
+|  **Condition**  |  **Service State**   | **What Generates Alerts**  |
+|-------------------|------------------------------|-------------------|
+| A.  Wazuh EDR only    | WazuhSvc running, winlogbeat stopped | Wazuh custom rules  |
+| B.  ELK only     | WazuhSvc Stopped, winlogbeat running | EQL rules in Kibana with winlogbeat-\*index only |
+| C.  Integrated   | WazuhSvc running, winlogbeat running | Both platforms simultaneously   |
+
+ Table 4: Experimental conditions setup
 
 # Investigating Alerts
 
