@@ -1,6 +1,6 @@
 # Attack Simulations
 
-> ### ⚠️ Lab use only
+> ###  Lab use only
 > Every command below is an adversary-emulation technique designed only for
 > the isolated, host-only virtual lab described in this repository. They are here
 > to document how the detection rules were validated and to let others reproduce
