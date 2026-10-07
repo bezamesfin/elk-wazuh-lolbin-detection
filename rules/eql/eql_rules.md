@@ -6,7 +6,7 @@ These are the Event Correlation (EQL) rules created in the Kibana detection engi
 
 - Individual technique rules (A-series): `winlogbeat-*`
 - File integrity rule (A8): `wazuh-alerts-*`
-- Chained rules (B-series): `winlogbeat-*` and `wazuh-alerts-*` together, so that sequences can span both data sources
+- Chained rules (B-series): `winlogbeat-*` and `wazuh-alerts-*` together, so that sequences can cover both data sources
 
 Deployment steps are in the [configuration manual](../../docs/configuration-manual.md#eql-rules-in-kibana).
 
