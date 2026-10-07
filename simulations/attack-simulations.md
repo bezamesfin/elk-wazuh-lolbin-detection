@@ -1,18 +1,15 @@
 # Attack Simulations
 
 > ### ⚠️ Lab use only
-> Every command below is an adversary-emulation technique intended **solely** for
+> Every command below is an adversary-emulation technique designed only for
 > the isolated, host-only virtual lab described in this repository. They are here
 > to document how the detection rules were validated and to let others reproduce
-> the experiment in an equivalent closed environment. **Do not run them on any
-> machine or network you do not own and fully control.** The author accepts no
-> responsibility for misuse.
+> the experiment.
 
 The simulations are grouped into nine individual techniques (A1–A9) and six
 chained scenarios (B1–B6), all mapped to MITRE ATT&CK. Several individual steps
 reuse [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) tests.
-Placeholders such as `<ELK_SERVER_IP>` replace the lab IP address used in the
-original runs.
+Placeholders such as `<ELK_SERVER_IP>` replace the lab IP address bieng used.
 
 
 #####   Individual Attack Simulation
